@@ -1,23 +1,28 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect('mongodb+srv://Rahulraj:Rahulraj-2002@cluster0.dh2u9rs.mongodb.net/?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Connected to MongoDB');
-})
-.catch((error) => {
-  console.error('Error connecting to MongoDB:', error.message);
-});
 
+// Connect to MongoDB
+mongoose
+.connect('mongodb+srv://Rahulraj:Rahulraj-2002@cluster0.dh2u9rs.mongodb.net/?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error.message);
+  });
+
+// Define the Mongoose model
 const FormModel = mongoose.model('PortfolioForm', new mongoose.Schema({
   name: String,
   email: String,
@@ -33,9 +38,11 @@ app.post('/submit-form', async (req, res) => {
   const formData = req.body;
 
   try {
+    // Create a new document using the FormModel
     const form = await FormModel.create(formData);
     console.log('Form data saved to MongoDB:', form);
 
+    // Send an email asynchronously
     sendEmail(formData);
 
     res.status(200).json({ message: 'Form submitted successfully' });
@@ -68,7 +75,7 @@ async function sendEmail(formData) {
     console.error('Error sending email:', error);
   }
 }
-
-app.listen(3002, () => {
-  console.log('Server is running at http://localhost:3002');
-});
+  
+  app.listen(3002, () => {
+    console.log('Server is running at http://localhost:3002');
+  });
